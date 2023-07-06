@@ -15,7 +15,9 @@ export type EarthquakeData = EarthquakeRawData & {
 };
 
 async function getEarthquakes(): Promise<EarthquakeData[]> {
-    const url = 'https://corsproxy.io/?' + encodeURIComponent('https://en.vedur.is/earthquakes-and-volcanism/earthquakes#view=table');
+    const url =
+        'https://corsproxy.io/?' +
+        encodeURIComponent('https://en.vedur.is/earthquakes-and-volcanism/earthquakes#view=table');
 
     return axios
         .get(url)
@@ -42,10 +44,13 @@ async function getEarthquakes(): Promise<EarthquakeData[]> {
 
                 const data: EarthquakeRawData[] = JSON.parse(jsonString.replace(/'/g, '"'));
 
-                return data.map((data: EarthquakeRawData) => ({
-                    ...data,
-                    id: `${new Date(data.t).toISOString()}-${data.lat}`,
-                } as EarthquakeData));
+                return data.map(
+                    (data: EarthquakeRawData) =>
+                        ({
+                            ...data,
+                            id: `${new Date(data.t).toISOString()}-${data.lat}`,
+                        }) as EarthquakeData,
+                );
             } else {
                 console.warn('Quake info not found.');
                 return [];

@@ -13,10 +13,10 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
 const LEGEND_COLOR_1 = '#FF0000';
-const LEGEND_COLOR_2 = "rgba(255,128,0,0.7)"
-const LEGEND_COLOR_3 = "rgba(71,161,0,0.6)"
-const LEGEND_COLOR_4 = "rgba(66,166,246,0.5)"
-const LEGEND_COLOR_5 = "rgba(0,64,147,0.4)"
+const LEGEND_COLOR_2 = 'rgba(255,128,0,0.7)';
+const LEGEND_COLOR_3 = 'rgba(71,161,0,0.6)';
+const LEGEND_COLOR_4 = 'rgba(66,166,246,0.5)';
+const LEGEND_COLOR_5 = 'rgba(0,64,147,0.4)';
 
 const TIMESPAN_4H = 4;
 const TIMESPAN_12H = 12;
@@ -34,7 +34,7 @@ const CustomCard = styled(Paper)(({ theme }) => ({
 
 function App() {
     const [earthquakes, setEarthquakes] = useState<EarthquakeData[]>([]);
-    const [hoursSinceEarthquake, setHoursSinceEarthquake] = useState(TIMESPAN_48H)
+    const [hoursSinceEarthquake, setHoursSinceEarthquake] = useState(TIMESPAN_48H);
 
     const handleHoursSinceEarthquakeChange = (
         _1: React.MouseEvent<HTMLElement>,
@@ -52,20 +52,20 @@ function App() {
     useEffect(() => {
         const fetchData = async () => {
             const data = await earthquakeService.getEarthquakes();
-            const filtered = data.filter(earthquake => {
+            const filtered = data.filter((earthquake) => {
                 const hours = getHoursSinceEarthquake(earthquake);
-                return hoursSinceEarthquake > hours
-            })
+                return hoursSinceEarthquake > hours;
+            });
             setEarthquakes(filtered);
         };
 
-        fetchData().catch((e) => console.log(e))
+        fetchData().catch((e) => console.log(e));
 
-        const interval = setInterval(() => fetchData().catch((e) => console.log(e)), 120000)
+        const interval = setInterval(() => fetchData().catch((e) => console.log(e)), 120000);
 
         return () => {
-            clearInterval(interval)
-        }
+            clearInterval(interval);
+        };
     }, [hoursSinceEarthquake]);
 
     function getHoursSinceEarthquake(earthquake: EarthquakeData) {
@@ -118,9 +118,19 @@ function App() {
         <Layout>
             <Box component='main' sx={{ flexGrow: 1, p: 3 }}>
                 <Grid container spacing={2}>
-                    <Grid xs={12} display="flex" justifyContent="center">
-                        <ToggleButtonGroup size="small" {...hoursSinceEarthquakeControl}>
-                            {[TIMESPAN_4H, TIMESPAN_12H, TIMESPAN_24H, TIMESPAN_36H, TIMESPAN_48H].map(v => (<ToggleButton key={v} value={v}>{v + ' hours'}</ToggleButton>))}
+                    <Grid xs={12} display='flex' justifyContent='center'>
+                        <ToggleButtonGroup size='small' {...hoursSinceEarthquakeControl}>
+                            {[
+                                TIMESPAN_4H,
+                                TIMESPAN_12H,
+                                TIMESPAN_24H,
+                                TIMESPAN_36H,
+                                TIMESPAN_48H,
+                            ].map((v) => (
+                                <ToggleButton key={v} value={v}>
+                                    {v + ' hours'}
+                                </ToggleButton>
+                            ))}
                         </ToggleButtonGroup>
                     </Grid>
                     <Grid xs={12}>
