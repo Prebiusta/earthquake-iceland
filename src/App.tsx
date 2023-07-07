@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import ReactDOMServer from 'react-dom/server';
 import { Paper, Stack, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import Layout from './components/Layout.tsx';
 import Box from '@mui/material/Box';
@@ -11,6 +12,8 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
+import EarthquakeScatterPlot from './components/EarthquakeScatterPlot.tsx';
+import moment from 'moment';
 
 const LEGEND_COLOR_1 = '#FF0000';
 const LEGEND_COLOR_2 = 'rgba(255,128,0,0.7)';
@@ -32,9 +35,21 @@ const CustomCard = styled(Paper)(({ theme }) => ({
     dropShadow: theme.shadows,
 }));
 
+interface ChartOption {
+    key: keyof EarthquakeData;
+    label: string;
+}
+
+const CHART_OPTIONS: ChartOption[] = [
+    { key: 's', label: 'Strength' },
+    { key: 'dep', label: 'Depth' },
+    { key: 'q', label: 'Quality' },
+];
+
 function App() {
     const [earthquakes, setEarthquakes] = useState<EarthquakeData[]>([]);
     const [hoursSinceEarthquake, setHoursSinceEarthquake] = useState(TIMESPAN_48H);
+    const [chartOption, setChartOption] = useState<ChartOption>(CHART_OPTIONS[0]);
 
     const handleHoursSinceEarthquakeChange = (
         _1: React.MouseEvent<HTMLElement>,
@@ -46,6 +61,19 @@ function App() {
     const hoursSinceEarthquakeControl = {
         value: hoursSinceEarthquake,
         onChange: handleHoursSinceEarthquakeChange,
+        exclusive: true,
+    };
+
+    const handleChartOptionChange = (
+        _1: React.MouseEvent<HTMLElement>,
+        newChartOption: ChartOption,
+    ) => {
+        setChartOption(newChartOption);
+    };
+
+    const chartOptionControl = {
+        value: chartOption,
+        onChange: handleChartOptionChange,
         exclusive: true,
     };
 
@@ -92,14 +120,32 @@ function App() {
     };
 
     const resolveRadius = (earthquake: EarthquakeData): number => {
-        return earthquake.s * 2 + 2;
+        return parseFloat(earthquake.s) * 2 + 2;
     };
 
     const markers = earthquakes.map((earthquake) => ({
         ...earthquake,
+        lon: parseFloat(earthquake.lon),
+        lat: parseFloat(earthquake.lat),
         color: resolveColor(earthquake),
         radius: resolveRadius(earthquake),
+        popupContent: ReactDOMServer.renderToString(
+            <div>
+                <div style={{textAlign: 'center', fontSize: '16px'}}><b>{earthquake.s}</b></div>
+                <h4>{earthquake.t}</h4>
+                <hr style={{margin: '0.25rem 0'}} />
+                <div style={{textAlign: 'center'}}>{`[${earthquake.lat}, ${earthquake.lon}]`}</div>
+            </div>,
+        ),
     }));
+
+    const scatterPlotData = earthquakes
+        .map((earthquake) => ({
+            ...earthquake,
+            color: resolveColor(earthquake),
+            t: moment(earthquake.t).format('dddd, kk:mm:ss'),
+        }))
+        .reverse();
 
     const createLegendItem = (color: string, text: string) => (
         <Stack spacing={1} direction='row' alignItems='center' justifyContent='center'>
@@ -147,6 +193,24 @@ function App() {
                                 {createLegendItem(LEGEND_COLOR_4, '24h - 36h')}
                                 {createLegendItem(LEGEND_COLOR_5, '36h - 48h')}
                             </Stack>
+                        </CustomCard>
+                    </Grid>
+                    <Grid xs={12} xl={6}>
+                        <Grid xs={12} display='flex' justifyContent='center' mb={2}>
+                            <ToggleButtonGroup size='small' {...chartOptionControl}>
+                                {CHART_OPTIONS.map((v) => (
+                                    <ToggleButton key={v.key} value={v}>
+                                        {v.label}
+                                    </ToggleButton>
+                                ))}
+                            </ToggleButtonGroup>
+                        </Grid>
+                        <CustomCard>
+                            <EarthquakeScatterPlot
+                                label={chartOption.label}
+                                dataValueKey={chartOption.key}
+                                data={scatterPlotData}
+                            />
                         </CustomCard>
                     </Grid>
                 </Grid>

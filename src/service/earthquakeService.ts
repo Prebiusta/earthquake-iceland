@@ -3,15 +3,16 @@ import axios from 'axios';
 type EarthquakeRawData = {
     t: string;
     a: string;
-    lat: number;
-    lon: number;
-    dep: number;
-    q: number;
-    s: number;
+    lat: string;
+    lon: string;
+    dep: string;
+    q: string;
+    s: string;
 };
 
 export type EarthquakeData = EarthquakeRawData & {
     id: string;
+    color?: string
 };
 
 async function getEarthquakes(): Promise<EarthquakeData[]> {
