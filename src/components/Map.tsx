@@ -6,7 +6,7 @@ interface IMapProps {
     markers: Marker[];
 }
 
-type Marker = {
+export type Marker = {
     lon: number;
     lat: number;
     popupContent?: string;
@@ -47,7 +47,7 @@ const Map = (props: IMapProps) => {
         };
     }, [props]);
 
-    return <div id='map' style={{ height: '700px' }}></div>;
+    return <div id='map' style={{ height: '700px', maxHeight: '80vh' }}></div>;
 };
 
 export default Map;

@@ -5,6 +5,9 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   base: "/earthquake-iceland",
   plugins: [react()],
+  optimizeDeps: {
+    exclude: ['chartjs-adapter-moment']
+  },
   server: {
     proxy: {
       "/earthquakes": {

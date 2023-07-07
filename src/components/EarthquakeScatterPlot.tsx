@@ -1,16 +1,18 @@
 import {
     BarElement,
     CategoryScale,
-    Chart as ChartJS,
+    Chart as ChartJS, ChartOptions,
     Legend,
     LinearScale,
     LineElement,
     PointElement,
+    TimeScale,
     Title,
     Tooltip,
 } from 'chart.js';
 import chartTrendline from 'chartjs-plugin-trendline';
-import { Bar } from 'react-chartjs-2';
+import 'chartjs-adapter-moment';
+import { Scatter } from 'react-chartjs-2';
 import { EarthquakeData } from '../service/earthquakeService.ts';
 
 ChartJS.register(
@@ -22,6 +24,7 @@ ChartJS.register(
     Legend,
     Tooltip,
     Title,
+    TimeScale,
     chartTrendline,
 );
 
@@ -32,12 +35,16 @@ interface IEarthquakeScatterPlotProps {
 }
 
 export default function EarthquakeScatterPlot(props: IEarthquakeScatterPlotProps) {
-    const options = {
+    const options: ChartOptions<'scatter'> = {
         responsive: true,
         scales: {
             x: {
-                ticks: {
-                    maxTicksLimit: 8,
+                type: 'time',
+                time: {
+                    unit: 'hour',
+                    displayFormats: {
+                        hour: 'dddd - ha',
+                    },
                 },
             },
         },
@@ -47,17 +54,19 @@ export default function EarthquakeScatterPlot(props: IEarthquakeScatterPlotProps
                 text: props.label,
             },
             legend: {
-                display: false
-            }
+                display: false,
+            },
         },
     };
 
     const data = {
-        labels: props.data.map((e) => e.t),
         datasets: [
             {
-                data: props.data.map((e) => e[props.dataValueKey]),
-                backgroundColor: props.data.map(e => e.color),
+                data: props.data.map((e) => ({
+                    x: e.t,
+                    y: e[props.dataValueKey],
+                })),
+                backgroundColor: props.data.map((e) => e.color),
                 barThickness: 2,
                 trendlineLinear: {
                     colorMax: 'rgb(0,0,0)',
@@ -70,5 +79,5 @@ export default function EarthquakeScatterPlot(props: IEarthquakeScatterPlotProps
         ],
     };
 
-    return <Bar options={options} data={data} />;
+    return <Scatter options={options} data={data} />;
 }
