@@ -40,7 +40,7 @@ function App() {
     const [earthquakes, setEarthquakes] = useState<EarthquakeData[]>([]);
     const [hoursSinceEarthquake, setHoursSinceEarthquake] = useState(TIMESPAN_48H);
     const [chartOption, setChartOption] = useState<ChartOption>(CHART_OPTIONS[0]);
-    const [minQuality] = useState<number>(80);
+    const [minQuality] = useState<number>(0);
 
     const handleHoursSinceEarthquakeChange = (
         _1: React.MouseEvent<HTMLElement>,
